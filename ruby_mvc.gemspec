@@ -29,9 +29,9 @@ Gem::Specification.new do |s|
   s.name        = "ruby_mvc"
   s.version     = "0.0.0"
   s.summary     = "Ruby MVC"
-  s.description = "A basic MVC framework for Ruby"
+  s.description = "A simple, cross-platform MVC framework for Ruby"
   s.authors     = [ "Andrew S. Townley" ]
   s.email       = "ast@atownley.org"
-  s.files       = FileList['lib/**/*.rb', 'test/**/*', '[A-Z]*', 'ruby_mvc.gemspec'].to_a
+  s.files       = FileList['lib/**/*.rb', 'sample/**/*', 'test/**/*', '[A-Z]*', 'ruby_mvc.gemspec'].to_a
   s.homepage    = "https://github.com/atownley/ruby_mvc"
 end
