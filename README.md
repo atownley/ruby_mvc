@@ -50,16 +50,18 @@ wxRuby, that things will all work as expected.
 Additionally, you might consider an alias like the following somewhere
 handy like .profile or .bashrc
 
-	alias wxruby="arch -i386 ruby -rubygems"
+	$ alias wxruby="arch -i386 ruby -rubygems"
 
 This link is also useful if using rvm and ruby 1.9.x:
 http://www.ruby-forum.com/topic/212707#969982.  The magic is this
 command:
 
-	rvm install ruby-1.9.2 -C --with-arch=x86_64,i386
+	$ rvm install ruby-1.9.2-head -C --with-arch=x86_64,i386
 
 Once you do the above, you should be able to successfully install the
-wxruby-ruby19 gem.
+wxruby-ruby19 gem using the following platform magic:
+
+	$ gem install --platform x86-darwin-9 --no-ri --no-rdoc wxruby-ruby19
 
 ### Windows
 

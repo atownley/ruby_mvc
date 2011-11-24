@@ -34,6 +34,10 @@ module RubyMVC
         def initialize(options = {}, &block)
           super(WxRuby.parent(options))
           set_background_colour(Wx::WHITE)
+          if self.respond_to? :evt_html_link_clicked
+            evt_html_link_clicked self, :on_link_clicked
+            #evt_html_cell_hover self, :on_hover
+          end
         end
 
         attr_reader :location
@@ -78,6 +82,10 @@ module RubyMVC
         #++
 
         def on_link_clicked(link)
+          if link.is_a? Wx::HtmlLinkEvent
+            # fixup for version 2.0.1 API changes
+            link = link.link_info
+          end
           signal_emit("navigation-requested", self, link.href, link.target)
         end
 
