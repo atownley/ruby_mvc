@@ -104,7 +104,7 @@ module Models
     # all linked views are sent.
 
     def update_row(index, row)
-      signal_emit("row-updated", index, row)
+      signal_emit("row-changed", index, row)
     end
 
     # This method will iterate over each of the rows and

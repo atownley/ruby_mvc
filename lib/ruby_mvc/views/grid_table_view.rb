@@ -83,6 +83,9 @@ module Views
         row = model[r]
         signal_emit("row-edit", self, model, r, row)
       end
+
+      puts "self.class.signals: #{self.class.signals.keys.inspect}"
+      puts "widget.class.signals: #{widget.class.signals.keys.inspect}"
     end
   end
 

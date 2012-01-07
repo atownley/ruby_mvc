@@ -89,8 +89,8 @@ module RubyMVC
             @gm = GridModel.new(model)
             set_table(@gm, Wx::Grid::GridSelectRows)
           end
-          @model.signal_connect("row-updated") do |s, i, r|
-            puts "refresh row-updated"
+          @model.signal_connect("row-changed") do |s, i, r|
+            puts "refresh row-changed"
             @gm = GridModel.new(model)
             set_table(@gm, Wx::Grid::GridSelectRows)
           end

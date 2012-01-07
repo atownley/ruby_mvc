@@ -62,7 +62,7 @@ module RubyMVC
 
       def self.create_widget(klass, options = {})
         w = self.widget_def(klass)
-        args = (w[:args] << options)
+        args = (w[:args].clone << options)
         block = w[:block]
         args[0].new(*args[1..-1], &block)
       end
@@ -92,9 +92,11 @@ module RubyMVC
       # appropriately manage signal registration
 
       def signal_connect(signal, &b)
+        puts "Widget class: #{@widget.class}"
         if @widget.class.valid_signal? signal
           @widget.signal_connect(signal, &b)
         else
+         puts "super"
           super
         end
       end

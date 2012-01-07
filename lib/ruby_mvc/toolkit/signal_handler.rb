@@ -97,15 +97,31 @@ module Toolkit
       end
 
       def valid_signal?(signal)
-        if !signals.has_key?(signal) && (self.superclass.respond_to?(:valid_signal?) && !self.superclass.valid_signal?(signal))
+#        puts "#{self}#signals.keys: #{signals.keys.inspect}"
+#        puts "#{self}#signals.has_key? #{signal}: #{signals.has_key?(signal)}"
+#        if self.superclass.respond_to?(:valid_signal?)
+#          puts "#{self.superclass}#signals.keys: #{self.superclass.signals.keys.inspect}"
+#          puts "#{self.superclass}#valid_signal? #{signal}: #{self.superclass.valid_signal?(signal)}"
+#        end
+
+        return true if signals.has_key? signal
+
+        if self.superclass.respond_to? :valid_signal?
+          self.superclass.valid_signal? signal
+        else
+          false
+        end
+      end
+
+      def valid_signal!(signal)
+        if !valid_signal? (signal)
           raise ArgumentError, "class #{self} does not support signal '#{signal}'"
         end
-        true
       end
     end
 
     def signal_connect(signal, &block)
-      self.class.valid_signal? signal if self.class.respond_to? :signals
+      self.class.valid_signal! signal if self.class.respond_to? :signals
       signals = (@signals ||= {})
       sigs = (signals[signal] ||= [])
       if !sigs.include? block
@@ -114,14 +130,14 @@ module Toolkit
     end
 
     def signal_disconnect(signal, &block)
-      self.class.valid_signal? signal if self.class.respond_to? :signals
+      self.class.valid_signal! signal if self.class.respond_to? :signals
       signals = (@signals ||= {})
       sigs = (signals[signal] ||= [])
       sigs.delete(block)
     end
 
     def signal_emit(signal, *args)
-      self.class.valid_signal? signal if self.class.respond_to? :signals
+      self.class.valid_signal! signal if self.class.respond_to? :signals
       signals = (@signals ||= {})
       (signals[signal] ||= []).each do |proc|
         proc.call(*args) if !proc.nil?
