@@ -33,7 +33,7 @@ module RubyMVC
 
   class Action
     include Toolkit::PropertyChangeNotifier
-    attr_reader :key, :sensitive
+    attr_reader :key
 
     def initialize(key, options = {}, &block)
       @key = key.to_sym
@@ -44,6 +44,13 @@ module RubyMVC
       if !(x = options[:sensitive]).nil?
         @sensitive = x
       end
+    end
+
+    # This method is used to access the options for this
+    # action.
+
+    def [](key)
+      @options[key]
     end
 
     def label
@@ -61,20 +68,25 @@ module RubyMVC
       end
     end
 
+    # This method may be overridden by action instances to
+    # have more control over when the action should be enabled
+    # or not.
+
+    def sensitive
+      @sensitive
+    end
+
     # This method is used to allow the action instances to
     # determine internal state changes based on selection
     # state changes in their view.
 
-    def selection(sender, model, row_list)
-      puts "key: #{key}; enable: #{@options[:enable]}; row_list = #{row_list.inspect}"
+    def selection(sender, model, sel)
       case @options[:enable]
       when :select_multi
-        self.sensitive = row_list.size >= 1
+        self.sensitive = sel.size >= 1
       when :select_single
-        self.sensitive = row_list.size == 1
+        self.sensitive = sel.size == 1
       end
-
-      puts "#{key} sensitive: #{self.sensitive}"
     end
   end
 

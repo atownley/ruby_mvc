@@ -23,6 +23,8 @@
 #####################################################################
 #++ 
 
+require 'ruby_mvc/models/model'
+require 'ruby_mvc/models/view_model_template'
 require 'ruby_mvc/models/table_model'
 require 'ruby_mvc/models/array_table_model'
 require 'ruby_mvc/models/keyed_array_table_model'

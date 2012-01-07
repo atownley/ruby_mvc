@@ -26,6 +26,17 @@
 module RubyMVC
   module Toolkit
   
-    class Dialog < Widget; end
+    class Dialog < Widget
+      def add(w)
+        # FIXME: this is a cheezy way to do this...
+        if w.is_a? RubyMVC::Views::FormView
+          peer.add_form(w)
+        elsif w.is_a? RubyMVC::Views::View
+          peer.add_view(w)
+        else
+          peer.add(w)
+        end
+      end
+    end
   end
 end

@@ -65,6 +65,7 @@ module RubyMVC
         end
 
         def show
+          self.centre
           if @modal
             if Wx::ID_OK == self.show_modal()
               @wxform.submit if @wxform

@@ -23,7 +23,7 @@
 #####################################################################
 #++ 
 
-module ShoesMVC
+module RubyMVC
 module Models
 
   class KeyedArrayTableModel < TableModel

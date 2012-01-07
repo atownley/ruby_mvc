@@ -55,6 +55,10 @@ module Models
       self.instance_eval(&block) if block
     end
 
+    def keys
+      @options[:properties]
+    end
+
     # Implement the Model#labels method in terms of the
     # template definition
 
@@ -102,7 +106,7 @@ module Models
       if show && !@options[:properties].include?(key)
         @options[:properties] << key
         l = options[:alias] || key.to_s.capitalize
-        @labels << { :key => key, :label => l }
+        @labels << options.merge({ :key => key, :label => l })
       elsif !show
         @options[:properties].delete(key)
         @labels.delete_if do |k|
@@ -112,10 +116,13 @@ module Models
     end
 
     # This method is used to apply the template to a specific,
-    # concrete model instance.
+    # concrete model instance, creating a clone of the
+    # template in the process so that multiple different
+    # models can be used with the same template definition.
 
     def apply(model)
       @model = model
+      self.clone
     end
 
     def method_missing(m, *args, &block)

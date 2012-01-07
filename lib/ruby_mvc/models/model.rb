@@ -32,13 +32,38 @@ module Models
   # because not all properties of a model are always editable.
 
   class Model
+    include Toolkit::SignalHandler
+    extend Toolkit::SignalHandler::ClassMethods
+
+    # this signal is emitted when any property is changed on
+    # the model.  The arguments are the sender, the old and
+    # the new values
+
+    signal "property-changed"
+
+    # This method is used to use the Model class to adapt any
+    # object that responds to the #keys, #size, #[] and #[]=
+    # methods
+
+    def self.adapt(obj, options = {})
+      return obj if obj.is_a? Model
+      self.new(options.merge({:data => obj}))
+    end
+
     # The base model is backed by a simple Hash, and supports
     # specifying the following options for defining which
     # properties are editable or not.
 
     def initialize(options = {})
-      @data = {}
+      @data = options.delete(:data) || {}
       @options = options
+    end
+
+    # This method is used to provide the property keys of the
+    # model as symbols.
+
+    def keys
+      @data.keys.sort.collect { |k| k.to_sym }
     end
 
     # This method is used to retrieve the property key and the
@@ -47,7 +72,7 @@ module Models
 
     def labels
       @labels = {}
-      @data.keys.collect do |k|
+      self.keys.collect do |k|
         x = { :key => k.to_sym, :label => k.to_s.capitalize }
         @labels[x[:key]] = x[:label]
         x
@@ -66,7 +91,13 @@ module Models
     end
 
     def []=(key, val)
-      @data[key.to_sym] = val
+      k = key.to_sym
+      old = @data[k]
+      @data[k] = val
+
+      if old != val
+        signal_emit("property-changed", self, k, old, val)
+      end
     end
 
     def size
@@ -77,7 +108,7 @@ module Models
     # the model.  For each property, the key, label and value
     # are provide as arguments to the block
 
-    def each(&block)
+    def each_label(&block)
       labels.each do |l|
         block.call((k = l[:key]), l[:label], @data[k])
       end

@@ -23,10 +23,11 @@
 ######################################################################
 #++
 
+$:.unshift File.join(File.dirname(__FILE__), "../../../lib")
 require 'testy'
-require 'shoes_mvc/models'
+require 'ruby_mvc/models'
 
-include ShoesMVC::Models
+include RubyMVC::Models
 
 Testy.testing "Core KeyedArrayTableModel tests" do
   test "Basic functionality" do |result|

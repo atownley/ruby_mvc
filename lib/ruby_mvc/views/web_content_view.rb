@@ -17,17 +17,31 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     views.rb
-# Created:  Sat 19 Nov 2011 11:28:08 GMT
+# File:     web_content_view.rb
+# Created:  Tue  3 Jan 2012 00:41:51 CET
 #
 #####################################################################
 #++ 
 
-require 'ruby_mvc/views/view'
-require 'ruby_mvc/views/web_content_view'
-require 'ruby_mvc/views/web_content_table_view'
-require 'ruby_mvc/views/form_view'
-require 'ruby_mvc/views/grid_table_view'
-require 'ruby_mvc/views/browser_view'
-#require 'ruby_mvc/views/table_view'
-#require 'ruby_mvc/views/web_table_view'
+module RubyMVC
+module Views
+
+  # WebContentView instances are used to render models as web
+  # content to be displayed in either the Toolkit::WebView or
+  # the Views::BrowserView instances.
+
+  class WebContentView < View
+    attr_reader :uri
+
+    def initialize(model, options = {})
+      super(options)
+      @model = model
+      @uri = options[:uri]
+    end
+
+    def render
+    end
+  end
+
+end
+end

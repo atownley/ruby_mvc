@@ -23,19 +23,21 @@
 ######################################################################
 #++
 
+$:.unshift File.join(File.dirname(__FILE__), "../../../lib")
+
 require 'testy'
-require 'ruby_mvc/models'
+require 'ruby_mvc'
 
 include RubyMVC::Models
 
-Testy.testing "Core ArrayTableModel tests" do
+Testy.testing "Core HashArrayTableModel tests" do
   test "Basic functionality" do |result|
     keys = [ :foo, :bar ]
     data = [
       { :foo => "Foo1", :bar => "Bar1" }, 
       { :foo => "Foo2", :bar => "Bar2" } ]
     
-    model = ArrayTableModel.new(data)
+    model = HashArrayTableModel.new(data)
     model.each_with_index do |row, i|
       keys.each do |key|
         result.check "row[#{i}][:#{key}] value is correct",
@@ -52,5 +54,19 @@ Testy.testing "Core ArrayTableModel tests" do
             :actual => row[key]
       end
     end
+  end
+
+  test "Signal handling" do |result|
+    data = [
+      { :foo => "Foo1", :bar => "Bar1" }, 
+      { :foo => "Foo2", :bar => "Bar2" } ]
+
+    model = HashArrayTableModel.new([])
+    model.signal_connect("rows-inserted") do |s, i, r|
+      result.check "rows-inserted",
+          :expect => [ 0, true ],
+          :actual => [ i, r.size == 2 ]
+    end
+    model.insert_rows(0, data)
   end
 end

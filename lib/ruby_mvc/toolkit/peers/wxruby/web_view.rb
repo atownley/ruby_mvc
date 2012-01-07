@@ -38,29 +38,32 @@ module RubyMVC
             evt_html_link_clicked self, :on_link_clicked
             #evt_html_cell_hover self, :on_hover
           end
+          @history = BrowserHistory.new
         end
 
-        attr_reader :location
+        def location
+          @history.current
+        end
 
         def can_go_back?
-          history_can_back
+          @history.has_prev?
         end
 
         def can_go_forward?
-          history_can_forward
+          @history.has_next?
         end
 
         def go_back
-          history_back
+          load_entry @history.prev
         end
 
         def go_forward
-          history_forward
+          load_entry @history.next
         end
 
         def open(uri)
-          @location = uri
-          load_page(uri)
+          @history << { :uri => uri }
+          load_entry(@history.current)
         end
 
         def stop_loading
@@ -68,13 +71,22 @@ module RubyMVC
         end
 
         def reload
-          open(location)
+          load_entry(@history.current)
         end
 
         def load_html(html, base_uri = nil)
           # FIXME: this isn't quite right...
-          set_page(html)
-          @location = base_uri
+          @history << { :uri => base_uri, :content => html }
+          load_entry(@history.current)
+        end
+
+        def append_html(html = "", &block)
+          # FIXME: not sure if I want to keep this API as it
+          # seems kinda clunky...
+          h = html || ""
+          h << block.call if block
+          @history.current[:content] << h
+          append_to_page(h)
         end
 
         #--
@@ -87,6 +99,16 @@ module RubyMVC
             link = link.link_info
           end
           signal_emit("navigation-requested", self, link.href, link.target)
+        end
+
+      protected
+        def load_entry(entry)
+          if html = entry[:content]
+            set_page(html)
+          else
+            load_page(entry[:uri])
+          end
+          signal_emit("load-finished", self, entry[:uri])
         end
 
       end

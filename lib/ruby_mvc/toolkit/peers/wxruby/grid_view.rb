@@ -99,6 +99,7 @@ module RubyMVC
         def set_table(table, flags)
           super
           @selected_rows.clear
+          auto_size_columns(false)
           signal_emit("row-selection-changed", self, @model, @selected_rows)
         end
 

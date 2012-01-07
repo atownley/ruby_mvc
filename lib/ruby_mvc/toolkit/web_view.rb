@@ -30,7 +30,7 @@ module RubyMVC
     # modelled on WebKit
 
     class WebView < Widget
-      api_method :load_html
+      api_methods :load_html, :append_html
       api_methods :can_go_back?, :go_back
       api_methods :can_go_forward?, :go_forward
       api_methods :open, :reload, :go_home, :location

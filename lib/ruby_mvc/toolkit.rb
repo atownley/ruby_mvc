@@ -23,9 +23,12 @@
 #####################################################################
 #++ 
 
-require 'ruby_mvc/toolkit/notification'
+require 'ruby_mvc/toolkit/signal_handler'
+require 'ruby_mvc/toolkit/property_change_notifier'
 require 'ruby_mvc/toolkit/widget'
 require 'ruby_mvc/toolkit/app'
 require 'ruby_mvc/toolkit/dialog'
 require 'ruby_mvc/toolkit/frame'
+require 'ruby_mvc/toolkit/browser_history'
 require 'ruby_mvc/toolkit/web_view'
+require 'ruby_mvc/toolkit/grid_view'

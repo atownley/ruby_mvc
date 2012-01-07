@@ -63,7 +63,21 @@ wxruby-ruby19 gem using the following platform magic:
 
 	$ gem install --platform x86-darwin-9 --no-ri --no-rdoc wxruby-ruby19
 
+
 ### Windows
 
 Amazingly enough, it seems to *just work* on Windows (Vista is the
 only tested configuration at the moment).  YMMV.
+
+
+Building and Publishing the Gem
+-------------------------------
+
+In order to build the gem, simply execute the following command:
+
+    $ gem build ruby_mvc.gemspec
+
+Once you're sure things are working, then push the gem to
+rubygems.org:
+
+    $ gem push ruby_mvc-VERSION.gem

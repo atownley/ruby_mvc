@@ -17,8 +17,8 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     grid_table_view.rb
-# Created:  Mon  2 Jan 2012 16:39:48 CET
+# File:     browser_view.rb
+# Created:  Mon  2 Jan 2012 23:03:17 CET
 #
 ######################################################################
 #++
@@ -29,40 +29,29 @@ include RubyMVC
 # NOTE: this is a simple, in-line test.  You wouldn't really
 # do it this way in a real application.
 
-RubyMVC.app :title => "GridTableView Sample", :width => 800, :height => 600 do
+RubyMVC.app :title => "BrowserView Sample", :width => 800, :height => 600 do
   data = [
     { :id => 1, :fname => "Bob", :lname => "Jones" },
     { :id => 2, :fname => "Leslie", :lname => "Smith" },
     { :id => 3, :fname => "Jake", :lname => "Bennigan" }
   ]
 
-  model = Models::HashArrayTableModel.new(data, :row_template => {})
-#  model.signal_connect("rows-inserted") do |s, idx, rows|
-#    puts "insert #{rows.size} rows at #{idx}"
-#    puts "Model: #{model.inspect}"
-#  end
-#  model.signal_connect("rows-removed") do |s, idx, rows|
-#    puts "removed #{rows.size} rows"
-#    puts "Model: #{model.inspect}"
-#  end
-
+  model = Models::HashArrayTableModel.new(data)
   template = Models::ViewModelTemplate.new do
     property :id, :alias => "ID", :editable => false
     property :fname, :alias => "First name"
     property :lname, :alias => "Last name"
   end
+  web_table = Views::WebContentTableView.new(template.apply(model))
   
-  grid = Views::GridTableView.new(template.apply(model), 
-                :show_row_labels => false, :editable => false)
-  grid.signal_connect("row-edit") do |s, m, i, r|
-    form = Views::FormView.new(template.apply(r))
-    form.signal_connect("form-submit") do |form, d|
-      m.update_row(i, r)
-    end
-    dialog :title => "Row Editor", :parent => frame do |dlg|
-      dlg.add(form)
-    end
-  end
+  browser = Views::BrowserView.new
+  frame.add(browser)
 
-  frame.add(grid)
+  browser.open "test.html"
+  browser.load_html("<h1>Hello</h1>", "internal:hello")
+  browser.load(web_table)
+  browser.signal_connect("navigation-requested") do |s, href, t|
+    puts "navigation requested: #{href}"
+    s.open href
+  end
 end

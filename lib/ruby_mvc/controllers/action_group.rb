@@ -49,7 +49,12 @@ module RubyMVC
     end
 
     def delete(action)
-      val = @index.delete(action.key)
+      if action.is_a? Symbol
+        key = action
+      else
+        key = action.key
+      end
+      val = @index.delete(key)
       @actions.delete(val)
     end
 

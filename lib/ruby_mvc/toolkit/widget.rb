@@ -25,15 +25,22 @@
 
 module RubyMVC
   module Toolkit
-  
+
+    # This class provides an un-peered abstract widget, mostly
+    # related to signal handling capabilities so that
+    # abstract, non-peer views can be created with built-in
+    # signal handling.
+
+    class AbstractWidget
+      include SignalHandler
+      extend SignalHandler::ClassMethods
+    end
+
     # This class defines the base toolkit widget class.  Each
     # widget has one - and only one - UI peer that is
     # registered automatically when the UI peer is loaded.
 
-    class Widget
-      include SignalHandler
-      extend SignalHandler::ClassMethods
-
+    class Widget < AbstractWidget
       class << self
         attr_accessor :peer_class
 
@@ -96,7 +103,7 @@ module RubyMVC
 
       def connect_peer_signals
         self.class.signals.each do |s, opts|
-          puts "connecting signal '#{s}' to #{peer}"
+          puts "connecting signal '#{peer}##{s}' to #{self}"
           peer.signal_connect(s) do |*args|
             args[0] = self
             signal_emit(s, *args)

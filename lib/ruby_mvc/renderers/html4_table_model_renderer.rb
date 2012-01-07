@@ -47,16 +47,17 @@ module RubyMVC
             :valign => "top"
       }.freeze
 
-      def self.render(model, cols, options = {})
-        self.new.render(model, cols, options)
+      def self.render(model, options = {})
+        self.new.render(model, options)
       end
 
-      def render(model, cols, options = {})
+      def render(model, options = {})
         options = OPTIONS.merge(options)
         tagz {
           table_(options) {
-            build_header(model, cols, options)
-            model.each { |row| build_row(cols, row) }
+            labels = model.labels
+            build_header(model, labels, options)
+            model.each { |row| build_row(labels, row) }
           }
         }
       end
@@ -81,7 +82,7 @@ module RubyMVC
               tagz.concat r.render(self, row, col)
             else
               data = row[col[:key]]
-              style = TD_OPTIONS.merge(col[:style])
+              style = TD_OPTIONS.merge(col[:style] || {})
               weight = style.delete(:weight)
               td_(style) {
                 if weight == "bold"

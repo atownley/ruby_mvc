@@ -26,6 +26,10 @@
 require 'wx'
 
 require 'ruby_mvc/toolkit/peers/wxruby/common'
+require 'ruby_mvc/toolkit/peers/wxruby/form_builder'
 require 'ruby_mvc/toolkit/peers/wxruby/app'
+require 'ruby_mvc/toolkit/peers/wxruby/dialog'
 require 'ruby_mvc/toolkit/peers/wxruby/frame'
 require 'ruby_mvc/toolkit/peers/wxruby/web_view'
+require 'ruby_mvc/toolkit/peers/wxruby/grid_model'
+require 'ruby_mvc/toolkit/peers/wxruby/grid_view'

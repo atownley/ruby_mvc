@@ -31,4 +31,8 @@ RubyMVC.app :title => "WebView", :width => 800, :height => 600 do
   html = Toolkit::WebView.new
   frame.add(html)
   html.open "test.html"
+  html.signal_connect("navigation-requested") do |w, href, targ|
+    puts "navigation request: #{href}"
+    html.open href
+  end
 end

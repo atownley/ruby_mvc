@@ -23,35 +23,103 @@
 #####################################################################
 #++ 
 
-module ShoesMVC
+module RubyMVC
 module Models
 
-  # This class implements the TableModel interface based on
-  # the data being stored in an array.  The elements in the
-  # array must either be a Hash, or they must respond to the
-  # [] accessors for retrieving elements by key and implement
-  # a #keys method for indicating the properties in each row
-  # instance.
+  # This class provides an adapter to expose an array of
+  # hashes or anything else that responds to the #keys, #[]
+  # and #[]= methods as a TableModel instance.
+  #
+  # Note that the keys of the objects in the array will be
+  # requested as symbols and not as any other object type.
 
-  class ArrayTableModel < TableModel
-    def initialize(data)
+  class HashArrayTableModel < TableModel
+    def initialize(data, options = {})
+      raise ArgumentError, "argument not an Array" if !data.is_a? Array
+      super(options)
+
+      @options = options
       @data = data
     end
 
+    def create_rows(count = 1)
+      if f = @options[:row_factory]
+        f.call(count)
+      else
+        r = []
+        t = @options[:row_template] || @data.last
+        count.times { r << t.clone }
+        r
+      end
+    end
+
+    def insert_row(index, row)
+      @data.insert(index, row)
+      super(index, Model.adapt(row, @options))
+    end
+
+    def insert_rows(index, rows)
+      @data.insert(index, *rows)
+      super(index, rows.collect { |r| Model.adapt(r, @options) })
+    end
+    
+    def remove_row(index)
+      row = Model.adapt(@data.delete_at(index), @options)
+      signal_emit("rows-removed", self, index, [ row ])
+      row
+    end
+
+    def remove_rows(index, count)
+      rows = []
+      count.times do
+        rows << Model.adapt(@data.delete_at(index), @options)
+      end
+      signal_emit("rows-removed", self, index, rows)
+      rows
+    end
+
+    def update_row(index, row)
+      @data[index] = row
+      super(index, Model.adapt(row, @options))
+    end
+
+    # The keys used will come from the first element in the
+    # array or be empty if the array is empty.
+
     def keys
-      if @data && @data.size > 0
-        @data.keys
+      if @data.size > 0
+        @data.first.keys
       else
         {}
       end
     end
 
+    def value_for(row, key)
+      @data[row][key.to_sym]
+    end
+
+    def [](row)
+      @data[row]
+    end
+
+    # Iterates over each of the elements in the array and
+    # provides a Model instance to the caller based on the
+    # keys contained in the object itself.
+
     def each(&block)
-      @data.each(&block)
+      return if !block
+
+      @data.each do |x|
+        block.call(Model.adapt(x, @options))
+      end
     end
 
     def each_with_index(&block)
-      @data.each_with_index(&block)
+      return if !block
+
+      @data.each_with_index do |x, i|
+        block.call(Model.adapt(x, @options), i)
+      end
     end
   end
 

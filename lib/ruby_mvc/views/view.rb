@@ -27,6 +27,22 @@ module RubyMVC
   module Views
    
     class View < RubyMVC::Toolkit::AbstractWidget
+      attr_reader :actions
+      attr_accessor :controller
+
+      def initialize(options = {})
+        @actions = ActionGroup.new
+        @options = options
+        self.controller = options[:controller]
+        (options[:actions] || []).each { |a| @actions << a }
+      end
+
+    protected
+      def action(key, options = {}, &block)
+        a = Action.new(key, options, &block)
+        @actions << a
+        a
+      end
     end
 
     class PeerView < View
@@ -35,7 +51,7 @@ module RubyMVC
           @widget_def
         else
           if (x = targ.widget_def).nil?
-            if targ != RubyMVC::Views::View
+            if targ != RubyMVC::Views::PeerView
               self.widget_def(targ.superclass)
             end
           else
@@ -44,9 +60,9 @@ module RubyMVC
         end
       end
 
-      def self.create_widget(klass)
+      def self.create_widget(klass, options = {})
         w = self.widget_def(klass)
-        args = w[:args] 
+        args = (w[:args] << options)
         block = w[:block]
         args[0].new(*args[1..-1], &block)
       end
@@ -66,11 +82,28 @@ module RubyMVC
         @widget.peer
       end
 
-      attr_accessor :controller, :widget
-      def initialize(*args)
-        @widget = View.create_widget(self.class)
-        if(options = args.last).is_a? Hash
-          self.controller = options[:controller]
+      attr_accessor :widget
+      def initialize(options = {})
+        super
+        @widget = PeerView.create_widget(self.class, options)
+      end
+
+      # This method is required to ensure that concrete views
+      # appropriately manage signal registration
+
+      def signal_connect(signal, &b)
+        if @widget.class.valid_signal? signal
+          @widget.signal_connect(signal, &b)
+        else
+          super
+        end
+      end
+
+      def signal_disconnect(signal, &b)
+        if @widget.class.valid_signal? signal
+          @widget.signal_connect(signal, &b)
+        else
+          super
         end
       end
 

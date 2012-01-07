@@ -17,7 +17,7 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     notification.rb
+# File:     signal_handler.rb
 # Author:   Andrew S. Townley
 # Created:  Sat Nov  1 14:27:10 GMT 2008
 # Borrowed: Wed 23 Nov 2011 22:29:22 GMT
@@ -28,138 +28,64 @@
 module RubyMVC
 module Toolkit
 
-  # This class allows obsevers to register a single block
-  # rather than implementing public observer methods (which
-  # can get messy and unnecessarily pollute the public API
-  # of the class)
+  # This module provides an implementation of signal handlers
+  # originally modelled on the GTK+ 2.x mechanisms.  While it
+  # is similar to GTK+, it may not behave in exactly the same
+  # way.
   #
-  # Each registered block will be called with the following
-  # arguments:
+  # This module also defines some useful class methods to
+  # expand the meta-programming of Ruby objects to support
+  # signal handling.  To use these methods, you follow the
+  # following idiom in the derived class:
   #
-  # 1) The notification name (or the method name to be called)
-  # 2) The sender of the notification
-  # 3) The notification parameters.
-
-  class ObserverReference
-    attr_reader :observer
-
-    def initialize(observer, &block)
-      @observer = observer
-      @block = block
-    end
-
-    def method_missing(method, *args, &block)
-      if @observer.respond_to? method
-        @observer.send(method, *args, &block)
-      elsif !@block.nil?
-        @block.call(method, *args)
-      else
-        super
-      end
-    end
-  end
-
-  class ObserverList
-    def initialize
-      @observers = {}
-    end
-
-    def <<(val)
-      if !val.is_a? ObserverReference
-        raise ArgumentError, "can only have observer references in the list!"
-      end
-
-      @observers[val.observer] = val if !@observers.include? val.observer
-    end
-
-    def delete(val)
-      @observers.delete(val)
-    end
-
-    def each(&block)
-      @observers.each_value(&block)
-    end
-  end
-
-  # This class is used to relay notifications from one sender
-  # to another sender's registered listeners.
-
-  class NotificationRelay
-    def initialize(sender, listeners)
-      @listeners = listeners
-      @sender = sender
-    end
-
-    def method_missing(method, *args, &block)
-      args[0] = @sender
-      @listeners.each { |l| l.send(method, *args, &block) }
-    end
-  end
-
-  module ViewChangeNotifier
-    def register_view_change_observer(observer, &block)
-      observers = (@view_change_observers ||= ObserverList.new)
-      observers << ObserverReference.new(observer, &block)
-    end
-
-    def unregister_view_change_observer(observer)
-      observers = (@view_change_observers ||= ObserverList.new)
-      observers.delete(observer)
-    end
-
-  protected
-    def fire_view_changed
-      observers = (@view_change_observers ||= [])
-      observers.each { |o| o.view_changed(self) }
-    end
-  end
-
-  module ChangeNotifier
-    def register_change_observer(observer, &block)
-      observers = (@change_observers ||= ObserverList.new)
-      observers << ObserverReference.new(observer, &block)
-    end
-
-    def unregister_change_observer(observer)
-      observers = (@change_observers ||= [])
-      observers.delete(observer)
-    end
-
-    def squelch=(val)
-      @notification_squelch = val
-    end
-
-  protected
-    def fire_changed
-      return if @notification_squelch
-      observers = (@change_observers ||= [])
-      observers.each { |o| o.changed(self) }
-    end
-  end
-
-  module PropertyChangeNotifier
-    def register_property_change_observer(observer, &block)
-      observers = (@property_change_observers ||= [])
-      observers << ObserverReference.new(observer, &block)
-    end
-
-    def unregister_property_change_observer(observer)
-      observers = (@property_change_observers ||= [])
-      observers.delete(observer)
-    end
-
-    def squelch=(val)
-      @notification_squelch = val
-    end
-
-  protected
-    def fire_property_changed(property, old_val, new_val)
-      return if @notification_squelch
-      observers = (@property_change_observers ||= [])
-      observers.each { |o| o.property_changed(self, property, old_val, new_val) }
-    end
-  end
-
+  #   class SignalSource
+  #     incude RubyMVC::Toolkit::SignalHandler
+  #     extend RubyMVC::Toolkit::SignalHandler::ClassMethods
+  #     ...
+  #   end
+  #
+  # Once the class has been defined as per above, valid
+  # signals for the signal source may be defined using the
+  # class method #signal as follows:
+  #
+  #   class SignalSource
+  #     ...
+  #
+  #     signal "sig1", :description => "A test signal", 
+  #     signal "sig2", :description => "A vetoable signal", :vetoable => true
+  #     ...
+  #   end
+  #
+  # To register for signal notification, use the
+  # #signal_connect method of the signal source instance as
+  # follows:
+  #
+  #   src = SignalSource.new
+  #   src.signal_connect "sig1" do |sender|
+  #     ...
+  #   end
+  #
+  # Internally to the signal source instance, the signal can
+  # be triggered using the #signal_emit method as follows
+  #
+  #   class SignalSource
+  #     def send_sig1
+  #       ...
+  #       signal_emit("sig1", self)
+  #       ...
+  #     end
+  #   end
+  #
+  # Planned Areas of Improvement
+  # ============================
+  #
+  # Currently, there's not a really good way to document the
+  # signals so that they're clear.  I'm not sure how these are
+  # represented in rdoc, but there should be a method/way to
+  # specify the arguments in order and what they should be so
+  # that they live with the signal definition within the class
+  # itself so things are self-documenting.
+  
   module SignalHandler
     module ClassMethods
       def signals
@@ -171,32 +97,37 @@ module Toolkit
       end
 
       def valid_signal?(signal)
-        if !signals.has_key? signal
+        if !signals.has_key?(signal) && (self.superclass.respond_to?(:valid_signal?) && !self.superclass.valid_signal?(signal))
           raise ArgumentError, "class #{self} does not support signal '#{signal}'"
         end
+        true
       end
     end
 
     def signal_connect(signal, &block)
       self.class.valid_signal? signal if self.class.respond_to? :signals
       signals = (@signals ||= {})
-      signals[signal] = block
+      sigs = (signals[signal] ||= [])
+      if !sigs.include? block
+        sigs << block
+      end
     end
 
-    def signal_disconnect(signal)
+    def signal_disconnect(signal, &block)
       self.class.valid_signal? signal if self.class.respond_to? :signals
       signals = (@signals ||= {})
-      signals.delete(signal)
+      sigs = (signals[signal] ||= [])
+      sigs.delete(block)
     end
 
     def signal_emit(signal, *args)
       self.class.valid_signal? signal if self.class.respond_to? :signals
       signals = (@signals ||= {})
-      if signals.key? signal
-        proc = signals[signal]
+      (signals[signal] ||= []).each do |proc|
         proc.call(*args) if !proc.nil?
       end
     end
-  end   
+  end
+
 end
 end

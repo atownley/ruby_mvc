@@ -17,8 +17,8 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     web_view.rb
-# Created:  Wed 23 Nov 2011 17:08:02 GMT
+# File:     table_view.rb
+# Created:  Sat 19 Nov 2011 20:14:33 GMT
 #
 #####################################################################
 #++ 
@@ -26,24 +26,16 @@
 module RubyMVC
 module Views
 
-  # This is a more sophisticated view control vs. the standard
-  # toolkit widget.
-
-  class WebView < View
-    widget Toolkit::WebView
+  class TableView < View
+    def initialize(model, options = {}, &block)
+      super(options, &block)
+      load(model, options, &block)
+    end
 
     # This method is used to load the view with the
     # information in the table model.
 
     def load(model, options = {}, &block)
-      cols = columns(model, options)
-      if r = options[:renderer]
-        html = r.render(model, cols, options[:renderer_options])
-        puts "HTML:\n#{html}"
-        widget.load_html(html)
-      else
-        raise ArgumentError,"renderer not specified"
-      end
     end
 
   protected
