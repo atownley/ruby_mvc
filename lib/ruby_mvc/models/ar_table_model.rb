@@ -35,11 +35,12 @@ module Models
   class ActiveRecordTableModel < TableModel
     attr_reader :keys
 
-    def initialize(entity_type, rows = nil)
+    def initialize(entity_type, options = {})
       super()
       @row_idx = []
       @entity_type = entity_type
-      @rows = rows 
+      @rows = options[:rows]
+      @filter = options[:filter]
       @keys = @entity_type.attribute_names.sort
 
       # FIXME: this is a hack because I'm not sure how best to
@@ -49,7 +50,7 @@ module Models
 
     def create_rows(count = 1)
       rows = []
-      count.times { rows << @entity_type.new }
+      count.times { rows << @entity_type.new(@filter) }
       rows
     end
 
@@ -123,7 +124,11 @@ module Models
 
   protected
     def _rows
-      x = @rows || @entity_type.find(:all)
+      if @filter
+        x = @entity_type.where(@filter)
+      else
+        x = @rows || @entity_type.find(:all)
+      end
       puts "working with #{x.count} rows"
       x
     end

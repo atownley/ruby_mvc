@@ -28,7 +28,7 @@ module Views
 
   class ActiveRecordWebTypeList < WebContentTableView
     def initialize(entity_type, options = {}, &block)
-      @model = Models::ActiveRecordTableModel.new(entity_type)
+      @model = Models::ActiveRecordTableModel.new(entity_type, options)
       if options.is_a? Hash
         @template = options[:template]
       else

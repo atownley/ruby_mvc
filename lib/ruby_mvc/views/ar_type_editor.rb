@@ -30,7 +30,7 @@ module Views
     def initialize(app, parent, entity_type, options = {}, &block)
       options[:editable] = false
       options[:show_row_labels] = false
-      @model = Models::ActiveRecordTableModel.new(entity_type)
+      @model = Models::ActiveRecordTableModel.new(entity_type, options)
       @template = options[:template]
       super((@template ? @template.apply(@model) : @model), options)
       signal_connect("row-edit") do |s, m, i, r|
@@ -40,6 +40,8 @@ module Views
             begin
               r.save!
               m.update_row(i, r)
+            rescue ActiveRecord::StatementInvalid => e
+              app.error(e, :title => "Database Error", :parent => dlg)
             rescue ActiveRecord::RecordInvalid => e
               app.error(e, :title => "Validation Error", :parent => dlg)
             end
