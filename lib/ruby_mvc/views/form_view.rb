@@ -85,7 +85,7 @@ module Views
         else
           disabled = false
         end
-        block.call(k, l[:label], @model[k], @editors[k], disabled)
+        block.call(k, l[:label], @model[k], @editors[k] || l[:editor], disabled)
       end
     end
 

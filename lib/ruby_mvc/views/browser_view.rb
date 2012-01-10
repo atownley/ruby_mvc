@@ -39,7 +39,7 @@ module Views
 
       class << action(:back,
         :label => "Back", :icon => :stock_back, :widget => widget) do
-          widget.go_back
+          go_back
         end
 
         def sensitive
@@ -51,7 +51,7 @@ module Views
 
       class << action(:forward, 
         :label => "Forward", :icon => :stock_forward, :widget => widget) do
-          widget.go_forward
+          go_forward
         end
 
         def sensitive
@@ -63,7 +63,7 @@ module Views
 
       class << action(:reload,
         :label => "Reload", :icon => :stock_reload, :widget => widget) do
-          widget.reload
+          reload
         end
 
         def sensitive
@@ -91,24 +91,52 @@ module Views
       end
     end
 
+    def go_forward
+      reset_actions
+      widget.go_forward
+      append_actions((location || {})[:actions])
+    end
+
+    def go_back
+      reset_actions
+      widget.go_back
+      append_actions((location || {})[:actions])
+    end
+
     def open(uri)
+      reset_actions
       widget.open(uri)
     end
 
     def load_html(*args)
+      reset_actions
+#      puts "#load_html: " << args.inspect
       widget.load_html(*args)
+    end
+
+    def reload
+      if location && v = location[:view]
+        load(v, location[:uri])
+      else
+        super
+      end
     end
 
     def append_html(*args, &block)
       widget.append_html(*args, &block)
     end
 
-    def load(view)
+    def load(view, uri = nil)
       if !view.is_a? WebContentView
         raise ArgumentError, "view must currently be a WebContentView instance"
       end
 
-      load_html(view.render, view.uri)
+      # FIXME: need action support in the history management
+      # too so that actions are appropriately added/removed
+      # during forward/backward navigation requests
+
+      load_html(view.render, uri || view.uri)
+      widget.location[:view] = view
 
       # If our view provides a different controller, then we
       # need to defer link handling to that controller instead
@@ -121,6 +149,9 @@ module Views
       else
         puts "no controller defined for #{view}"
       end
+
+      # add any content actions
+      append_actions(view.actions)
     end
 
     def add(view)
@@ -129,6 +160,24 @@ module Views
       end
 
       append_html(view.render)
+
+# FIXME: this should really be done, but we need to be a bit
+# more sophisticated in the way we manage it
+#      append_actions(view.actions)
+    end
+
+  private
+    def append_actions(actions)
+      return if !actions
+
+      location[:actions] = actions if location
+      frame.merge_actions(actions)
+    end
+
+    def reset_actions
+      if location && (ca = location[:actions])
+        frame.unmerge_actions(ca)
+      end
     end
   end
 

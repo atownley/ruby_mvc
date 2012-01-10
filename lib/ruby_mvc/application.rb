@@ -38,6 +38,10 @@ module RubyMVC
 
     def initialize(options, &block)
       @windows = []
+      if ico = options[:icon]
+        ico = options[:icon] = File.expand_path(ico)
+        puts "icon requested: #{ico}"
+      end
       @windows << (self.frame = Toolkit::Frame.new(options))
       if cc = options[:controller]
         self.controller = cc
@@ -51,9 +55,7 @@ module RubyMVC
     end
 
     def window(options, &block)
-      if !options[:parent]
-        options[:parent] = self.frame
-      end
+      set_parent(options)
 
       # FIXME: this is a bit of a hack for wxRuby peers
       options[:height] = @frame_height if !options[:height]
@@ -69,14 +71,24 @@ module RubyMVC
     end
 
     def dialog(options, &block)
-      if !options[:parent]
-        options[:parent] = self.frame
-      end
-
+      set_parent(options)
       dlg = Toolkit::Dialog.new(options)
       block.call(dlg) if block
       dlg.show
       dlg
+    end
+
+    def error(msg, options)
+      options[:class] = :error
+      dlg = Toolkit::MessageBox.new(msg, options)
+      dlg.show
+    end
+
+  protected
+    def set_parent(options)
+      if !options[:parent]
+        options[:parent] = self.frame
+      end
     end
   end
 
@@ -84,7 +96,7 @@ module RubyMVC
   # using the active toolkit.
   
   def self.app(*args, &block)
-    Toolkit::App.new do
+    Toolkit::App.new(*args) do
       Application.new(*args, &block)
     end
   end

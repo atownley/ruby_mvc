@@ -17,8 +17,8 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     web_content_view.rb
-# Created:  Tue  3 Jan 2012 00:41:51 CET
+# File:     ar_type_editor.rb
+# Created:  Mon 21 Nov 2011 18:00:49 GMT
 #
 #####################################################################
 #++ 
@@ -26,27 +26,27 @@
 module RubyMVC
 module Views
 
-  # WebContentView instances are used to render models as web
-  # content to be displayed in either the Toolkit::WebView or
-  # the Views::BrowserView instances.
-
-  class WebContentView < View
-    attr_reader :uri
-
-    def initialize(model, options = {})
-      super(options)
-      @model = model
-      @uri = options[:uri]
-    end
-
-    def render
-    end
-  end
-
-  # This view is used to render a simple model instance
-
-  class SimpleWebModelView < WebContentView
-    def render
+  class ActiveRecordTypeEditor < GridTableView
+    def initialize(app, parent, entity_type, options = {}, &block)
+      options[:editable] = false
+      options[:show_row_labels] = false
+      @model = Models::ActiveRecordTableModel.new(entity_type)
+      @template = options[:template]
+      super((@template ? @template.apply(@model) : @model), options)
+      signal_connect("row-edit") do |s, m, i, r|
+        app.dialog(:title => options[:editor_title], :parent => parent) do |dlg|
+          form = FormView.new((@template ?  @template.apply(r) : r), &block)
+          form.signal_connect("form-submit") do |form, d|
+            begin
+              r.save!
+              m.update_row(i, r)
+            rescue ActiveRecord::RecordInvalid => e
+              app.error(e, :title => "Validation Error", :parent => dlg)
+            end
+          end
+          dlg.add form
+        end
+      end
     end
   end
 

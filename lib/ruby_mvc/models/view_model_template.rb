@@ -43,6 +43,8 @@ module Models
   # may be accessed.
   
   class ViewModelTemplate
+    attr_accessor :title
+
     # When the ViewModelTemplate is initialized, it requires a set
     # of options and/or an optional initializer block that is
     # executed within the scope of the newly created instance.

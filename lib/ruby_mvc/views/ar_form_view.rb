@@ -33,7 +33,7 @@ module Views
     def initialize(model, &block)
       super
       signal_connect("form-submit") do |f, m|
-        m.save
+        m.save!
       end
     end
   end

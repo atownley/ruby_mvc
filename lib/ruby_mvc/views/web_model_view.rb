@@ -1,7 +1,7 @@
 #--
 ######################################################################
 #
-# Copyright 2011 Andrew S. Townley
+# Copyright 2011-2012 Andrew S. Townley
 #
 # Permission to use, copy, modify, and disribute this software for
 # any purpose with or without fee is hereby granted, provided that
@@ -17,20 +17,51 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     frame.rb
-# Created:  Wed 23 Nov 2011 10:39:10 GMT
+# File:     ar_web_row_view.rb
+# Created:  Mon  9 Jan 2012 15:56:18 GMT
 #
 #####################################################################
 #++ 
 
 module RubyMVC
-  module Toolkit
-  
-    class Frame < Widget
-      api_methods :add, :merge_actions
+module Views
 
-      signal "window-closed"
+  class WebModelView < WebContentView
+    include Tagz
+
+    def initialize(row, options = {})
+      if options.is_a? Hash
+        @template = options[:template]
+      else
+        @template = options
+        options = {}
+      end
+      super((@template ? @template.apply(row) : row), options)
     end
 
+    def render
+      render_properties
+    end
+
+  protected
+    def render_properties
+      tagz {
+        table_(:border => 0, :cellspacing => 3) {
+          @model.labels.each do |l|
+            k = l[:key]
+            tr_ {
+              th_(:valign => "top", :align => "left") {
+                strong_ l[:label]
+              }
+              td_(:align => "top") {
+                @model[k]
+              }
+            }
+          end
+        }
+      }
+    end
   end
+
+end
 end

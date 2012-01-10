@@ -50,6 +50,8 @@ module Views
       # Create the actions for the model
       action(:new, :label => "New row", :icon => :stock_new) do
         model.insert_rows(-1, model.create_rows)
+        idx = model.size - 1
+        signal_emit("row-edit", self, model, idx, model[idx])
       end
 
       action(:delete, 
@@ -57,6 +59,7 @@ module Views
               :enable => :select_multi,
               :icon => :stock_delete
               ) do
+        puts "rows: #{widget.selected_rows.inspect}"
         widget.selected_rows.reverse_each do |i|
           model.remove_row(i)
         end

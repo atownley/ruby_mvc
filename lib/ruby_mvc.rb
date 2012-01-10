@@ -24,6 +24,8 @@
 #++
 
 require 'yaml'
+require 'uri'
+require 'cgi'
 require 'ruby_mvc/module'
 require 'ruby_mvc/toolkit'
 require 'ruby_mvc/renderers'

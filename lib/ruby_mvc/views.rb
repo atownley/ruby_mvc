@@ -25,6 +25,7 @@
 
 require 'ruby_mvc/views/view'
 require 'ruby_mvc/views/web_content_view'
+require 'ruby_mvc/views/web_model_view'
 require 'ruby_mvc/views/web_content_table_view'
 require 'ruby_mvc/views/form_view'
 require 'ruby_mvc/views/grid_table_view'

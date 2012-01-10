@@ -76,7 +76,15 @@ module RubyMVC
 
         def load_html(html, base_uri = nil)
           # FIXME: this isn't quite right...
-          @history << { :uri => base_uri, :content => html }
+          if base_uri
+            if base_uri != @history.current[:uri]
+              @history << { :uri => base_uri, :content => html }
+            else
+              @history.current[:content] = html
+            end
+          else
+            @history << { :uri => base_uri, :content => html }
+          end
           load_entry(@history.current)
         end
 

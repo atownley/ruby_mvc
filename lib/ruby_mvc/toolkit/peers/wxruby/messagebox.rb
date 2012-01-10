@@ -1,7 +1,7 @@
 #--
 ######################################################################
 #
-# Copyright 2011 Andrew S. Townley
+# Copyright 2011-2012 Andrew S. Townley
 #
 # Permission to use, copy, modify, and disribute this software for
 # any purpose with or without fee is hereby granted, provided that
@@ -17,20 +17,42 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     frame.rb
-# Created:  Wed 23 Nov 2011 10:39:10 GMT
+# File:     messagebox.rb
+# Created:  Mon  9 Jan 2012 11:34:52 GMT
 #
 #####################################################################
 #++ 
 
 module RubyMVC
   module Toolkit
-  
-    class Frame < Widget
-      api_methods :add, :merge_actions
+    module WxRuby
+      class MessageBox < Wx::MessageDialog
+        include Common
+        Toolkit::MessageBox.peer_class = self
 
-      signal "window-closed"
+        def initialize(message, options)
+          opts = {}
+          title = options[:title] || "Message"
+          if parent = options[:parent]
+            parent = parent.peer
+          end
+          case(options[:class])
+          when :error
+            flags = Wx::OK | Wx::ICON_ERROR
+          when :info
+            flags = Wx::OK | Wx::ICON_INFORMATION
+          when :question
+            flags = Wx::YES_NO | Wx::ICON_QUESTION
+          else
+            flags = Wx::OK | Wx::CANCEL
+          end
+          super(parent, message.to_s, title, flags)
+        end
+
+        def show
+          show_modal
+        end
+      end
     end
-
   end
 end

@@ -1,7 +1,7 @@
 #--
 ######################################################################
 #
-# Copyright 2011 Andrew S. Townley
+# Copyright 2011-2012 Andrew S. Townley
 #
 # Permission to use, copy, modify, and disribute this software for
 # any purpose with or without fee is hereby granted, provided that
@@ -17,11 +17,28 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     renderers.rb
-# Created:  Wed 23 Nov 2011 17:06:49 GMT
+# File:     ar_web_type_list.rb
+# Created:  Mon  9 Jan 2012 15:56:18 GMT
 #
 #####################################################################
 #++ 
 
-require 'ruby_mvc/renderers/html4_table_model_renderer'
-require 'ruby_mvc/renderers/hyperlink_cell_renderer'
+module RubyMVC
+module Views
+
+  class ActiveRecordWebTypeList < WebContentTableView
+    def initialize(entity_type, options = {}, &block)
+      @model = Models::ActiveRecordTableModel.new(entity_type)
+      if options.is_a? Hash
+        @template = options[:template]
+      else
+        @template = options
+        options = {}
+      end
+      super((@template ? @template.apply(@model) : @model), options)
+      action(:edit, :label => "Edit", :icon => :stock_edit, &block)
+    end
+  end
+
+end
+end

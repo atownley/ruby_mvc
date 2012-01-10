@@ -24,5 +24,6 @@
 #++ 
 
 require 'ruby_mvc/views/ar_form_view'
-#require 'ruby_mvc/views/ar_support'
-#require 'ruby_mvc/views/ar_type_editor'
+require 'ruby_mvc/views/ar_type_editor'
+require 'ruby_mvc/views/ar_web_type_list'
+require 'ruby_mvc/views/ar_web_model_view'

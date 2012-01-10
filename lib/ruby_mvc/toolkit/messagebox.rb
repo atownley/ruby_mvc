@@ -1,7 +1,7 @@
 #--
 ######################################################################
 #
-# Copyright 2011 Andrew S. Townley
+# Copyright 2011-2012 Andrew S. Townley
 #
 # Permission to use, copy, modify, and disribute this software for
 # any purpose with or without fee is hereby granted, provided that
@@ -17,11 +17,16 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     renderers.rb
-# Created:  Wed 23 Nov 2011 17:06:49 GMT
+# File:     messagebox.rb
+# Created:  Mon  9 Jan 2012 11:39:56 GMT
 #
 #####################################################################
 #++ 
 
-require 'ruby_mvc/renderers/html4_table_model_renderer'
-require 'ruby_mvc/renderers/hyperlink_cell_renderer'
+module RubyMVC
+  module Toolkit
+  
+    class MessageBox < Widget
+    end
+  end
+end

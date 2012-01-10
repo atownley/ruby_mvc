@@ -82,23 +82,23 @@ module RubyMVC
           @model.signal_connect("rows-inserted") do |s, i, r|
             puts "refresh rows-inserted"
             @gm = GridModel.new(model)
-            set_table(@gm, Wx::Grid::GridSelectRows)
+            set_table(@gm, Wx::Grid::GridSelectRows, false)
           end
-          @model.signal_connect("rows-removed") do |s, r|
+          @model.signal_connect("rows-removed") do |s, i, r|
             puts "refresh rows-removed"
             @gm = GridModel.new(model)
-            set_table(@gm, Wx::Grid::GridSelectRows)
+            set_table(@gm, Wx::Grid::GridSelectRows, false)
           end
           @model.signal_connect("row-changed") do |s, i, r|
             puts "refresh row-changed"
             @gm = GridModel.new(model)
-            set_table(@gm, Wx::Grid::GridSelectRows)
+            set_table(@gm, Wx::Grid::GridSelectRows, false)
           end
         end
 
-        def set_table(table, flags)
-          super
-          @selected_rows.clear
+        def set_table(table, flags, clear_selection = true)
+          super(table, flags)
+          @selected_rows.clear if clear_selection
           auto_size_columns(false)
           signal_emit("row-selection-changed", self, @model, @selected_rows)
         end

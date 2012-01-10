@@ -54,7 +54,17 @@ module RubyMVC
           default_parent
         end
       end
-          
+      
+      def self.load_icon(path, size = nil)
+        img = Wx::Image.new(path)
+        if size
+          img = img.scale(size, size)
+        end
+        icon = Wx::Icon.new
+        icon.copy_from_bitmap(Wx::Bitmap.new(img))
+        icon
+      end
+
       # This module has some common things that map between
       # controls in the WxRuby universe
 

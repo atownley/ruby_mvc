@@ -1,7 +1,7 @@
 #--
 ######################################################################
 #
-# Copyright 2011 Andrew S. Townley
+# Copyright 2011-2012 Andrew S. Townley
 #
 # Permission to use, copy, modify, and disribute this software for
 # any purpose with or without fee is hereby granted, provided that
@@ -17,11 +17,43 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     renderers.rb
-# Created:  Wed 23 Nov 2011 17:06:49 GMT
+# File:     ar_web_model_view.rb
+# Created:  Mon  9 Jan 2012 22:45:05 GMT
 #
 #####################################################################
 #++ 
 
-require 'ruby_mvc/renderers/html4_table_model_renderer'
-require 'ruby_mvc/renderers/hyperlink_cell_renderer'
+module RubyMVC
+module Views
+
+  class ActiveRecordWebModelView < WebModelView
+    signal "row-edit"
+    signal "row-delete", :vetoable => true
+
+    def initialize(row, options = {})
+      super
+
+      action(:edit, :label => "Edit", :icon => :stock_edit) do
+        signal_emit("row-edit", self, row)
+      end
+
+#      action(:delete, :label => "Delete", :icon => :stock_delete) do
+#        signal_emit("row-delete", self, row)
+#      end
+    end
+
+    def render
+      html = super
+      tagz {
+        tagz.concat html
+        tagz.concat render_links
+      }
+    end
+
+  protected
+    def render_links
+    end
+  end
+
+end
+end

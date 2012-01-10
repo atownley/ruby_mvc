@@ -82,6 +82,10 @@ module RubyMVC
         @widget.peer
       end
 
+      # This method is used to retrieve a reference to the
+      # parent frame
+      attr_accessor :frame
+
       attr_accessor :widget
       def initialize(options = {})
         super

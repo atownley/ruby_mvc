@@ -29,13 +29,34 @@ module RubyMVC
       class App < Wx::App
         Toolkit::App.peer_class = self
 
-        def initialize(&block)
-          super
+        def initialize(options, &block)
+          super()
           @block = block
+          @options = options
           main_loop
         end
     
         def on_init
+          if icon = @options[:icon]
+
+# FIXME: the following does what yu expect, but the issue is
+# that we need to destroy it when the last application window
+# is closed (meaning we also need to track windows for this
+# too).  tbicon.remove_icon should cause everything to shut
+# down the way we expect.  What a PITA!!!
+#
+#            if Wx::PLATFORM == "WXMAC"
+#              # ensure we have a dock icon set
+#              tbicon = Wx::TaskBarIcon.new
+#              tbicon.set_icon(WxRuby.load_icon(icon), @options[:title])
+#              class << tbicon
+#                def create_popup_menu
+#                  puts "popup menu"
+#                  Wx::Menu.new
+#                end
+#              end
+#            end
+          end
           @block.call
         end
       end
