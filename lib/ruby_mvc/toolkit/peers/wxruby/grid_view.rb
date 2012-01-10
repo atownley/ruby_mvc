@@ -49,7 +49,7 @@ module RubyMVC
           end
 
           evt_grid_range_select do |e|
-            puts "Event alt: #{e.alt_down}; ctrl: #{e.control_down}; brc: #{e.get_bottom_right_coords}; bottom: #{e.get_bottom_row}; left: #{e.get_left_col}; right: #{e.get_right_col}; tlc: #{e.get_top_left_coords}; top: #{e.get_top_row}; meta: #{e.meta_down}; selecting: #{e.selecting}; shift: #{e.shift_down}" if !e.selecting
+#            puts "Event alt: #{e.alt_down}; ctrl: #{e.control_down}; brc: #{e.get_bottom_right_coords}; bottom: #{e.get_bottom_row}; left: #{e.get_left_col}; right: #{e.get_right_col}; tlc: #{e.get_top_left_coords}; top: #{e.get_top_row}; meta: #{e.meta_down}; selecting: #{e.selecting}; shift: #{e.shift_down}" if !e.selecting
             next if !e.selecting
 
             # FIXME: this should be a bit more clever in the
@@ -87,6 +87,7 @@ module RubyMVC
           @model.signal_connect("rows-removed") do |s, i, r|
             puts "refresh rows-removed"
             @gm = GridModel.new(model)
+            selected_rows.delete(i)
             set_table(@gm, Wx::Grid::GridSelectRows, false)
           end
           @model.signal_connect("row-changed") do |s, i, r|
