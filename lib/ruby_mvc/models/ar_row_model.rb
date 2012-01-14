@@ -17,13 +17,46 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     ar_support.rb
-# Created:  Mon 12 Dec 2011 06:49:00 CST
+# File:     ar_row_model.rb
+# Created:  Thu 12 Jan 2012 16:47:20 GMT
 #
 #####################################################################
 #++ 
 
-require 'ruby_mvc/views/ar_form_view'
-require 'ruby_mvc/views/ar_type_editor'
-require 'ruby_mvc/views/ar_web_type_list'
-require 'ruby_mvc/views/ar_web_model_view'
+module RubyMVC
+module Models
+
+  # This class provides a Model adapter implementation for
+  # ActiveRecordBase class instances.
+
+  class ActiveRecordRowModel < Model
+    def initialize(row, options = {})
+      options[:data] = row
+      super(options)
+    end
+
+    def entity_type
+      @data.class
+    end
+
+    def keys
+      @data.attributes.keys.collect { |k| k.to_sym }
+    end
+
+    # This method provides information about inter-model links
+    # to provide built-in support for master-detail types of
+    # relationships between models.
+
+    def link_labels
+      # FIXME: should probably implement this intelligently to
+      # do some introspection magic
+      {}
+    end
+
+    def size
+      @data.attributes.keys.size
+    end
+  end
+
+end
+end

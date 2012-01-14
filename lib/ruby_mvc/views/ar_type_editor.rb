@@ -35,7 +35,8 @@ module Views
       super((@template ? @template.apply(@model) : @model), options)
       signal_connect("row-edit") do |s, m, i, r|
         app.dialog(:title => options[:editor_title], :parent => parent) do |dlg|
-          form = FormView.new((@template ?  @template.apply(r) : r), &block)
+          fm = (@template ?  @template.apply(r) : Models::ActiveRecordRowModel.new(r))
+          form = FormView.new(fm, &block)
           form.signal_connect("form-submit") do |form, d|
             begin
               r.save!

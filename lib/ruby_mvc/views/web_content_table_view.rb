@@ -31,8 +31,13 @@ module Views
 
   class WebContentTableView < WebContentView
     def render
+      html = ""
+      if t = @options[:title]
+        html << "<h2>" << t << "</h2>"
+      end
+
       r = @options[:renderer] || Renderers::Html4TableModelRenderer
-      r.render(@model, @options)
+      html << r.render(@model, @options)
     end
   end
 

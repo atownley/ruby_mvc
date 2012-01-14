@@ -27,6 +27,14 @@ module RubyMVC
   module Toolkit
   
     class Dialog < Widget
+      # this signal is triggered after the dialog has been
+      # processed modally and will return one of a range of
+      # response codes, depending on the type of the dialog.
+      #
+      # The standard response codes are :accept or :cancel
+
+      signal "response"
+
       def add(w)
         # FIXME: this is a cheezy way to do this...
         if w.is_a? RubyMVC::Views::FormView

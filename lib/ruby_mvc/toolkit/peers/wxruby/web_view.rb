@@ -111,6 +111,7 @@ module RubyMVC
 
       protected
         def load_entry(entry)
+#          puts "ENTRY: #{entry.inspect}"
           if html = entry[:content]
             set_page(html)
           else

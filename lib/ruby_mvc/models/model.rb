@@ -79,6 +79,14 @@ module Models
       end
     end
 
+    # This method provides information about inter-model links
+    # to provide built-in support for master-detail types of
+    # relationships between models.
+
+    def link_labels
+      {}
+    end
+
     # This method is used to check whether a property key is
     # editable or not
 

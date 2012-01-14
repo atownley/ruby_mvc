@@ -43,6 +43,8 @@ module Models
   # may be accessed.
   
   class ViewModelTemplate
+    include ActionProvider
+
     attr_accessor :title
 
     # When the ViewModelTemplate is initialized, it requires a set
@@ -52,8 +54,10 @@ module Models
     def initialize(options = {}, &block)
       @options = options
       @labels = []
+      @link_labels = []
       @options[:editable] ||= {}
       @options[:properties] ||= []
+      @options[:links] ||= []
       self.instance_eval(&block) if block
     end
 
@@ -66,6 +70,10 @@ module Models
 
     def labels
       @labels
+    end
+
+    def link_labels
+      @link_labels
     end
 
     # Implement the Model#is_editable? method in terms of the
@@ -94,7 +102,7 @@ module Models
     # through the view.
 
     def property(key, options = {})
-      puts "options: #{options.inspect}"
+#      puts "options: #{options.inspect}"
       key = key.to_sym
       
       if false == options[:show]
@@ -117,6 +125,32 @@ module Models
       end
     end
 
+    # This method is used to declare a linked property for the
+    # model and make it available to the view
+
+    def link(key, options = {})
+      key = key.to_sym
+      
+      if false == options[:show]
+        show = false
+      else
+        show = true
+      end
+
+      editable(key, false) if false == options[:editable]
+      
+      if show && !@options[:links].include?(key)
+        @options[:links] << key
+        l = options[:alias] || key.to_s.capitalize
+        @link_labels << options.merge({ :key => key, :label => l })
+      elsif !show
+        @options[:links].delete(key)
+        @link_labels.delete_if do |k|
+          k[:key] == key
+        end
+      end
+    end
+    
     # This method is used to apply the template to a specific,
     # concrete model instance, creating a clone of the
     # template in the process so that multiple different

@@ -51,7 +51,7 @@ module RubyMVC
         def build(parent, form)
           @form = form
           form.layout do |key, label, val, editor, disabled|
-          puts "key: #{key}; disabled: #{disabled}"
+#          puts "key: #{key}; disabled: #{disabled}"
             case(editor)
             when :textarea
               w = build_textfield(parent, label, val, true)

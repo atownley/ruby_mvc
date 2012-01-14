@@ -59,7 +59,7 @@ module Views
               :enable => :select_multi,
               :icon => :stock_delete
               ) do
-        puts "rows: #{widget.selected_rows.inspect}"
+#        puts "rows: #{widget.selected_rows.inspect}"
         widget.selected_rows.reverse_each do |i|
           model.remove_row(i)
         end
@@ -76,7 +76,7 @@ module Views
       end
 
       widget.signal_connect("row-selection-changed") do |s, m, rows|
-        puts "selection changed: #{rows.inspect}"
+#        puts "selection changed: #{rows.inspect}"
         @actions.each do |a|
           a.selection(s, m, rows)
         end
@@ -87,8 +87,8 @@ module Views
         signal_emit("row-edit", self, model, r, row)
       end
 
-      puts "self.class.signals: #{self.class.signals.keys.inspect}"
-      puts "widget.class.signals: #{widget.class.signals.keys.inspect}"
+#      puts "self.class.signals: #{self.class.signals.keys.inspect}"
+#      puts "widget.class.signals: #{widget.class.signals.keys.inspect}"
     end
   end
 

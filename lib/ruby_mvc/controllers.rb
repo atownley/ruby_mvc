@@ -25,4 +25,5 @@
 
 require 'ruby_mvc/controllers/action'
 require 'ruby_mvc/controllers/action_group'
+require 'ruby_mvc/controllers/action_provider'
 require 'ruby_mvc/controllers/app_controller'

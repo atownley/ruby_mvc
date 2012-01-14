@@ -33,11 +33,13 @@ module RubyMVC
 
       def render(widget, row, col)
         lk = col[:hl_label_key] || col[:key]
+#        puts "LK: #{lk.inspect}; row: #{row.inspect}"
         text = row[lk]
-        val = row[col[:key]]
+        href = col[:href]
+        val = row[col[:href_key] || col[:key]]
         tagz {
-          td_ {
-            a_ text, :href => "#{col[:href]}#{val}"
+          td_(:valign => "top") {
+            a_ text, :href => "#{href}#{val}"
           }
         }
       end

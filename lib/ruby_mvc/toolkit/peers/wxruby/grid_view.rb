@@ -32,7 +32,7 @@ module RubyMVC
         Toolkit::GridView.peer_class = self
 
         def initialize(options = {})
-          puts "options: #{options.inspect}"
+#          puts "options: #{options.inspect}"
           super(WxRuby.parent(options), options[:id] || -1)
           if false == options[:show_row_labels]
             set_row_label_size(0)
@@ -58,7 +58,13 @@ module RubyMVC
 #            puts "Event alt: #{e.alt_down}; ctrl: #{e.control_down}; brc: #{e.get_bottom_right_coords}; bottom: #{e.get_bottom_row}; left: #{e.get_left_col}; right: #{e.get_right_col}; tlc: #{e.get_top_left_coords}; top: #{e.get_top_row}; meta: #{e.meta_down}; selecting: #{e.selecting}; shift: #{e.shift_down}"
             top = e.get_top_row
             bottom = e.get_bottom_row
-            sel = []
+            if e.meta_down || e.shift_down
+              # extending the selection
+              sel = @selected_rows.clone
+            else
+              # reset the selection
+              sel = []
+            end
             top.upto(bottom) do |i|
               sel << i
             end
@@ -80,18 +86,18 @@ module RubyMVC
           # Grid displaying it.  Kinda defeats the point...
 
           @model.signal_connect("rows-inserted") do |s, i, r|
-            puts "refresh rows-inserted"
+#            puts "refresh rows-inserted"
             @gm = GridModel.new(model)
             set_table(@gm, Wx::Grid::GridSelectRows, false)
           end
           @model.signal_connect("rows-removed") do |s, i, r|
-            puts "refresh rows-removed"
+#            puts "refresh rows-removed"
             @gm = GridModel.new(model)
             selected_rows.delete(i)
             set_table(@gm, Wx::Grid::GridSelectRows, false)
           end
           @model.signal_connect("row-changed") do |s, i, r|
-            puts "refresh row-changed"
+#            puts "refresh row-changed"
             @gm = GridModel.new(model)
             set_table(@gm, Wx::Grid::GridSelectRows, false)
           end

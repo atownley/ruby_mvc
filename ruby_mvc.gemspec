@@ -27,7 +27,7 @@ require 'rake'
 
 Gem::Specification.new do |s|
   s.name        = "ruby_mvc"
-  s.version     = "0.0.3"
+  s.version     = "0.0.4"
   s.summary     = "Ruby MVC"
   s.description = "A simple, cross-platform MVC framework for Ruby"
   s.authors     = [ "Andrew S. Townley" ]

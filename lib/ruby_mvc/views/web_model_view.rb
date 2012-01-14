@@ -30,6 +30,7 @@ module Views
     include Tagz
 
     def initialize(row, options = {})
+      @model_type = row.class
       if options.is_a? Hash
         @template = options[:template]
       else
@@ -46,7 +47,8 @@ module Views
   protected
     def render_properties
       tagz {
-        table_(:border => 0, :cellspacing => 3) {
+        h2_(@model_type)
+        table_(:border => 1, :cellspacing => 0) {
           @model.labels.each do |l|
             k = l[:key]
             tr_ {

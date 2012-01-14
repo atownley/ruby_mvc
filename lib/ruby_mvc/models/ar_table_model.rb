@@ -33,7 +33,7 @@ module Models
   # the rows matching a particular query.
 
   class ActiveRecordTableModel < TableModel
-    attr_reader :keys
+    attr_reader :keys, :entity_type
 
     def initialize(entity_type, options = {})
       super()
@@ -118,18 +118,18 @@ module Models
     end
 
     def size
-      puts "idx.size: #{@row_idx.size}"
+#      puts "idx.size: #{@row_idx.size}"
       [_rows.count, @row_idx.size].max
     end
 
   protected
     def _rows
-      if @filter
+      if @filter && !@rows
         x = @entity_type.where(@filter)
       else
         x = @rows || @entity_type.find(:all)
       end
-      puts "working with #{x.count} rows"
+#      puts "working with #{x.count} rows"
       x
     end
   end

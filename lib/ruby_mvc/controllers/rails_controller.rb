@@ -23,9 +23,7 @@
 #####################################################################
 #++ 
 
-require 'active_record'
-require 'ruby_mvc/models/ar_table_model'
-require 'ruby_mvc/views/ar_support'
+require 'ruby_mvc/ar_support'
 
 module RubyMVC
 

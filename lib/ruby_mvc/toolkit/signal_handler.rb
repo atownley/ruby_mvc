@@ -137,11 +137,21 @@ module Toolkit
     end
 
     def signal_emit(signal, *args)
+      # FIXME: there's a few things wrong with this now that
+      # we've changed to support multiple signal handlers.
+      # Registration/deregistration should be cleaner, but
+      # then we'd be using an observer pattern vs the signal
+      # handler.  Anyway, with multiple registered handlers,
+      # if the signal is vetoable, then it should throw a veto
+      # exception or something.
+
       self.class.valid_signal! signal if self.class.respond_to? :signals
       signals = (@signals ||= {})
+      rval = nil
       (signals[signal] ||= []).each do |proc|
-        proc.call(*args) if !proc.nil?
+        (rval = proc.call(*args)) if !proc.nil?
       end
+      rval
     end
   end
 

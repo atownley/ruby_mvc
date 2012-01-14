@@ -27,6 +27,7 @@ module RubyMVC
   module Toolkit
     module WxRuby
       class Dialog < Wx::Dialog
+        include SignalHandler
         include Common
         Toolkit::Dialog.peer_class = self
 
@@ -64,12 +65,26 @@ module RubyMVC
           self.sizer.fit(self)
         end
 
+        def add_view(view)
+          sizer = Wx::BoxSizer.new(Wx::VERTICAL)
+          view.peer.reparent(self)
+          sizer.add(view.peer, 1, Wx::EXPAND|Wx::ALL, 5)
+          sizer.add(@buttons, 0, Wx::ALIGN_RIGHT|Wx::ALL, 5)
+          self.sizer = sizer
+          layout
+        end
+
         def show
           self.centre
           if @modal
-            if Wx::ID_OK == self.show_modal()
+            case self.show_modal()
+            when Wx::ID_OK, Wx::ID_YES
               @wxform.submit if @wxform
+              resp = :accept
+            else
+              resp = :cancel
             end
+            signal_emit("response", self, resp)
           else
             sel.show()
           end

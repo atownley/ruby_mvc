@@ -103,7 +103,7 @@ module RubyMVC
 
       def connect_peer_signals
         self.class.signals.each do |s, opts|
-          puts "connecting signal '#{peer}##{s}' to #{self}"
+#          puts "connecting signal '#{peer}##{s}' to #{self}"
           peer.signal_connect(s) do |*args|
             args[0] = self
             signal_emit(s, *args)

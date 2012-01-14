@@ -25,23 +25,20 @@
 
 module RubyMVC
   module Views
-   
+
     class View < RubyMVC::Toolkit::AbstractWidget
-      attr_reader :actions
+      include ActionProvider
       attr_accessor :controller
 
       def initialize(options = {})
-        @actions = ActionGroup.new
         @options = options
         self.controller = options[:controller]
         (options[:actions] || []).each { |a| @actions << a }
       end
 
     protected
-      def action(key, options = {}, &block)
-        a = Action.new(key, options, &block)
-        @actions << a
-        a
+      def options
+        @options
       end
     end
 
@@ -73,7 +70,7 @@ module RubyMVC
         # widgets.
 
         def widget(*args, &block)
-          puts "Set widget for #{self}: #{args.inspect}"
+#          puts "Set widget for #{self}: #{args.inspect}"
           @widget_def = { :args => args, :block => block }
         end
       end
@@ -96,11 +93,11 @@ module RubyMVC
       # appropriately manage signal registration
 
       def signal_connect(signal, &b)
-        puts "Widget class: #{@widget.class}"
+#        puts "Widget class: #{@widget.class}"
         if @widget.class.valid_signal? signal
           @widget.signal_connect(signal, &b)
         else
-         puts "super"
+#         puts "super"
           super
         end
       end

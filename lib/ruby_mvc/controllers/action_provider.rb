@@ -17,35 +17,27 @@
 # NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
 # CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 #
-# File:     ar_web_type_list.rb
-# Created:  Mon  9 Jan 2012 15:56:18 GMT
+# File:     action_provider.rb
+# Created:  Sat 14 Jan 2012 13:16:53 GMT
 #
 #####################################################################
 #++ 
 
 module RubyMVC
-module Views
 
-  class ActiveRecordWebTypeList < WebContentTableView
-    signal "add-row"
+  # This module is used to provide actions to toolkit widget
+  # implementations for appropriate rendering based on the
+  # widget type.
 
-    def initialize(entity_type, options = {}, &block)
-      @model = Models::ActiveRecordTableModel.new(entity_type, options)
-      if options.is_a? Hash
-        @template = options[:template]
-      else
-        @template = options
-        options = {}
-      end
-      super((@template ? @template.apply(@model) : @model), options)
-      
-      action(:add, :label => "Add #{entity_type}", :icon => :stock_new) do
-        signal_emit("add-row", self, entity_type)
-      end
-     
-     action(:edit, :label => "Edit", :icon => :stock_edit, &block)
+  module ActionProvider
+    attr_reader :actions
+
+    def action(key, options = {}, &block)
+      @actions ||= ActionGroup.new
+      a = Action.new(key, options, &block)
+      @actions << a
+      a
     end
   end
 
-end
 end

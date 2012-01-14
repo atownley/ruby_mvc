@@ -85,7 +85,7 @@ module Views
       widget.signal_connect("navigation-requested") do |s, h, t|
         puts "BrowserView#navigation-requested: #{h}"
         if (c = self.controller)
-          puts "forwarding to controller: #{c}"
+#          puts "forwarding to controller: #{c}"
           c.link_activated(s, h)
         end
       end
@@ -115,7 +115,7 @@ module Views
     end
 
     def reload
-      if location && v = location[:view]
+      if location && (v = location[:view])
         load(v, location[:uri])
       else
         super
@@ -144,10 +144,10 @@ module Views
       # place)
 
       if (vc = view.controller) && vc != self.controller
-        puts "assigned new controller from WebContentView: #{vc}"
+#        puts "assigned new controller from WebContentView: #{vc}"
         self.controller = vc
       else
-        puts "no controller defined for #{view}"
+#        puts "no controller defined for #{view}"
       end
 
       # add any content actions

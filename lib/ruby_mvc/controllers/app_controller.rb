@@ -42,7 +42,16 @@ module RubyMVC
     def link_activated(sender, link)
       puts "#link_activated(#{sender}, #{link})"
       uri = URI.parse(link)
-      params = CGI.parse(uri.query) if uri.query
+      
+      if uri.query
+        params = CGI.parse(uri.query)
+        params.each do |k, v|
+          if v && v.size == 1
+            params[k] = v.first
+          end
+        end
+      end
+
       m = RubyMVC.method_name(uri.path).to_sym
       if self.respond_to? m
         self.send(m, sender, link, params)
